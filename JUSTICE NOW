@@ -1,0 +1,357 @@
+#!/usr/bin/env python3
+'''
+	CRIME ANALYSIS AND PREDICTION SOFTWARE
+			Description :
+				This software aims at answering, various questions like How was the trend of crimes over past years?,
+			Which crimes were more frequent?, Which gender is worst affected ?, What will be the crime in near future ? etc
+
+			Technology Used :
+				Data Science , Machine Learning , Data Visualization and Analysis
+			Tools Used : 
+				Python, Jupyter Notebook , Spyder 
+			Data Source : 
+				Kaggle.com and data.gov.in
+			Hardware Requirements :
+				2 GB Ram 
+				i3 intel core processor or equivalent
+			By :
+				Gopal Panigrahi [111]
+				Nikit Narkhede [107]
+				Sourabh Pisal [118]
+				Yogesh Rane [123]
+
+			Date : 12-10-2019
+
+'''
+
+from tkinter import *										# Used For GUI textbox,entry, button and Label
+import tkinter.ttk  as ttk								# Used For ComboBox ( Entry and Dropdown)
+import DataProcess as dp 									# Python File for applying various operation on data
+import Graphs as grp 										# Code for Data Visualization
+from tkinter import messagebox								# In GUI For Pop Up Box
+def main():
+	Welcome() 
+
+'''
+	Welcome function opens a welcome window consisting of a
+	background image and next button
+'''
+def Welcome():												
+	def Open_Analysis_Windows():							# Opens Next Window
+		welcome.destroy()									# Destroys welcome window
+		Menu()												# Calls Menu function 
+
+	welcome = Tk()
+	welcome.geometry("+450+100")							# Dimensions of window to be opened
+	welcome.configure(background="black",bd=7,relief='raised')
+	welcome.title("Data Science Project")
+	photo = PhotoImage(file = "Images/icon.png")
+	welcome.iconphoto(False, photo) 						# Icon of the window is selected
+	
+	background_image = PhotoImage(file='Images/background.png')
+	Label(welcome,image=background_image).pack()			# Background image is added
+
+	photo=PhotoImage(file="Images/forward.png")					# Button for going to next window
+	Button(welcome,image=photo,command=Open_Analysis_Windows,relief='flat',font=(None,10)).place(x=430,y=350)
+
+	welcome.mainloop()							
+'''
+	Window for loading data and sample cleaning along with Statistics about the data
+	It acts as gateway to Analysis window and Prediction Window 
+'''
+def Menu():
+	def show_dirty_data():  								# Function for showing dirty data
+		text = dp.retrieve_dirty()
+		k=0
+		for i in text:
+			Label(textrecord1,text=str('\t')+i[0]+str('\t'),bg='white').grid(row=k,column=1)
+			Label(textrecord1,text=i[1]+str('\t'),bg='white').grid(row=k,column=2)
+			Label(textrecord1,text=i[2]+str('\t'),bg='white').grid(row=k,column=3)
+			Label(textrecord1,text=i[3]+str('\t'),bg='white').grid(row=k,column=4)
+			Label(textrecord1,text=i[4]+str('\t'),bg='white').grid(row=k,column=5)
+			Label(textrecord1,text=i[5]+str('\t'),bg='white').grid(row=k,column=6)
+			Label(textrecord1,text=i[6]+str('\t'),bg='white').grid(row=k,column=7)
+			Label(textrecord1,text=i[7]+str('\t'),bg='white').grid(row=k,column=8)
+			Label(textrecord1,text=i[8]+str('\t'),bg='white').grid(row=k,column=9)
+			Label(textrecord1,text=i[9]+str('\t         '),bg='white').grid(row=k,column=10)
+			k+=1
+		textrecord1.configure(state='disabled')
+	def show_clean_data():									# Function for Displaying Clean data after processing it
+		text = dp.retrieve_clean()
+		k=0
+		for i in text:
+			Label(textrecord2,text=str('\t')+i[0]+str('\t'),bg='white').grid(row=k,column=2)
+			Label(textrecord2,text=i[1]+str('\t'),bg='white').grid(row=k,column=3)
+			Label(textrecord2,text=i[2]+str('\t'),bg='white').grid(row=k,column=4)
+			Label(textrecord2,text=i[3]+str('\t'),bg='white').grid(row=k,column=5)
+			Label(textrecord2,text=i[4]+str('\t'),bg='white').grid(row=k,column=6)
+			Label(textrecord2,text=i[5]+str('\t'),bg='white').grid(row=k,column=7)
+			Label(textrecord2,text=i[6]+str('\t                  '),bg='white').grid(row=k,column=8)
+			k+=1
+		textrecord2.configure(state='disabled')
+		text = dp.eda()
+		k=0
+		for i in text:
+			Label(textrecord3,text=str('\t')+i[0]+str('\t'),bg='white').grid(row=k,column=1)
+			Label(textrecord3,text=str(i[1])+str('\t'),bg='white').grid(row=k,column=2)
+			Label(textrecord3,text=str(i[2])+str('\t'),bg='white').grid(row=k,column=3)
+			Label(textrecord3,text=str(i[3])+str('\t'),bg='white').grid(row=k,column=4)
+			k+=1
+		Label(textrecord3,text='',bg='white').grid(row=k,column=1)
+		textrecord3.configure(state='disabled')
+
+	def Open_Analysis_Windows():							# Minimizes the menu window and opens analysis window
+		menu.withdraw()
+		Analysis_Windows(menu)
+	def Open_Prediction_Windows():							# Minimizes the menu window and opens prediction window
+		menu.withdraw()
+		Prediction_Windows(menu)
+
+	menu = Tk()
+	menu.geometry("1399x786")
+	menu.configure(background="#b3d9ff",bd=7,relief='raised')
+	menu.title("Data Science Project")
+	photo = PhotoImage(file = "Images/icon.png")
+	menu.iconphoto(False, photo)
+
+	Label(menu,text="MENU",bg='#b3d9ff',font=('Times New Roman',35)).place(x=550,y=50)
+
+	Button(menu,text="LOAD THE DATASET",font=('Verdana',10),bg='#3399ff',width=20,command=show_dirty_data).place(x=530,y=153)
+
+	textrecord1 = Text(menu, height=13, width=175,bd=5,relief='sunken')
+	textrecord1.place(x=30,y=190)
+	
+
+	Button(menu,text="CLEAN THE DATASET",font=('Verdana',10),bg='#3399ff',width=20,command=show_clean_data).place(x=530,y=393)
+
+	textrecord2 = Text(menu, height=13, width=97,bd=5,relief='sunken')
+	textrecord2.place(x=30,y=430)
+
+	textrecord3 = Text(menu, height=13, width=75,bd=5,relief='sunken')
+	textrecord3.place(x=730,y=430)
+	
+	Button(menu,text="ANALYZE",font=('Verdana',10),height=4,width=20,bg='#3399ff',command=Open_Analysis_Windows).place(x=400,y=640)
+	Button(menu,text="PREDICT",font=('Verdana',10),height=4,width=20,bg='#3399ff',command=Open_Prediction_Windows).place(x=700,y=640)
+
+	menu.mainloop()
+
+'''
+	Analysis window consists of various graphs , displaying statistical information
+	about various crimes according to age , gender and year
+'''
+def Analysis_Windows(menu):
+	def plot1():											# For Plotting Graph, calls other function in Graphs file			
+		grp.state_wise_count()
+		global photo
+		photo=PhotoImage(file='Images/statewise_crime_distribution.png')
+		Label(inbottomFrame,image=photo,height=400,width=550,bg='white').place(x=350,y=110)
+	def plot2():
+		grp.safestcities()
+		global photo
+		photo=PhotoImage(file='Images/top5safestcities.png')
+		Label(inbottomFrame,image=photo,height=400,width=550,bg='white').place(x=350,y=110)
+	def plot3():
+		grp.dangercity()
+		global photo
+		photo=PhotoImage(file='Images/top5dangerouscities.png')
+		Label(inbottomFrame,image=photo,height=400,width=550,bg='white').place(x=350,y=110)
+	def plot4():
+		global photo
+		grp.male2female()
+		photo=PhotoImage(file='Images/male2female.png')
+		Label(inbottomFrame,image=photo,height=400,width=550,bg='white').place(x=320,y=110)
+	def plot5():
+		global photo
+		grp.major_crime()
+		photo=PhotoImage(file='Images/major_crime.png')
+		Label(inbottomFrame,image=photo,height=400,width=550,bg='white').place(x=320,y=110)
+	def plot6():
+		global photo
+		grp.total_crime()
+		photo=PhotoImage(file='Images/total_crime.png')
+		Label(inbottomFrame,image=photo,height=400,width=550,bg='white').place(x=320,y=110)
+	def close():
+		if messagebox.askyesno("Exit","Do you really want to exit ?")==True:
+			grp.plt.close()
+			menu.destroy()
+	def back():												# Opens Menu window and closes current window
+		grp.plt.close()
+		analysis_win.destroy()
+		menu.deiconify()
+
+	photo = 1
+	analysis_win=Toplevel()
+	analysis_win.geometry("1399x786")
+
+	analysis_win.configure(background="#b3d9ff")
+	analysis_win.title("Crime prediction and analysis Software")
+	photo = PhotoImage(file = "Images/icon.png")
+	analysis_win.iconphoto(False, photo)
+
+	topFrame = Frame(analysis_win,bd=7,relief='raised',bg='yellow')
+	intopFrame = Frame(topFrame,bd=5,relief='raised',height=100,bg='#b3d9ff')
+	topFrame.pack(fill = X)
+	intopFrame.pack(fill = X)
+
+	bottomFrame = Frame(analysis_win,bd=7,relief='raised',bg='yellow')
+	inbottomFrame = Frame(bottomFrame,bd=5,relief='raised',width=2000,bg='#b3d9ff')
+	bottomFrame.pack(side=LEFT,fill = Y)
+	inbottomFrame.pack(side=LEFT,fill = Y)
+
+	Label(intopFrame,text="CRIME ANALYSIS AND VISUALIZATION",font=('Times New Roman',25),bg='#b3d9ff').place(x=400,y=20)
+	
+	Button(inbottomFrame,text="STATE WISE COUNT OF CRIME",font=('serif',15),command=plot1).place(x=450,y=50)
+	Button(inbottomFrame,text="TOP 5 SAFEST\n STATES/UT",font=('serif',15),command=plot2).place(x=100,y=150)
+	Button(inbottomFrame,text="TOP 5 CRIME INFLUENCED\n STATES/UT",font=('serif',15),command=plot3).place(x=920,y=150)
+	Button(inbottomFrame,text="MALE V\\S FEMALE CRIMES RATIO",font=('serif',15),command=plot4).place(x=450,y=520)
+	Button(inbottomFrame,text="MAJOR CRIMES",font=('serif',15),command=plot5).place(x=920,y=350)
+	Button(inbottomFrame,text="YEAR WISE TREND \nOF ALL CRIMES",font=('serif',15),command=plot6).place(x=70,y=350)
+	
+	backbtn = PhotoImage(file='Images/backward.png')
+	Button(intopFrame,image=backbtn,bg='#b3d9ff',relief='flat',command=back).place(x=30,y=10)
+	exitbtn = PhotoImage(file='Images/exit.png')	
+	Button(intopFrame,image=exitbtn,bg='#b3d9ff',relief='flat',command=close).place(x=1180,y=10)
+
+	analysis_win.mainloop()
+
+'''
+	Prediction window , takes various parameters from user and predicts the number
+	of crimes in the future in that state
+'''
+
+def Prediction_Windows(menu):
+	def plot():
+		if State.get()=='' or State.get()=='' or Age.get()=='' or Year.get()=='' or Crime.get()=='' or Gender.get()=='':
+			messagebox.showerror("Error","Please fill all the fields")
+			return
+		temp_yr = int(Year.get())
+		if temp_yr<2001:
+			messagebox.showerror("Error","Prediction May be Inaccurate thus Enter Year after 2001")
+			Year.set('')
+			return
+		if temp_yr>2016:
+			messagebox.showwarning("Warning","For the Year "+Year.get()+" Prediction May be Inaccurate")
+		del temp_yr		
+
+		predicted_value = dp.plotting(State.get(),Crime.get(),int(Year.get()),int(Age.get()),Gender.get())
+		Label(inrightFrame,text="We Predict That In Year "+Year.get()+" number of Crimes will be "+str(predicted_value),relief='sunken',width=67,bd=6,bg='lightgreen',font=('Courier',19)).place(x=25,y=10)
+		global photo
+		photo = PhotoImage(file = 'Images/plot.png')
+		Label(inrightFrame,image = photo,relief='flat').place(x=150,y=60)
+
+	def check_gender(*args):
+		global CrimeList
+		if (Gender.get()=='Female'):
+			CrimeBox.configure(values=['Rape','Murder','Kidnap', 'Dowry Deaths', 'C H Not Amounting To Murder', 'Molestation', 'Sexual Harassment', 'Cruelty By Husband And Relatives', 'Importation Of Girls', 'Immoral Traffic (Prevention) Act', 'Indecent Representation Of Women (Prohibition) Act', 'Attempt To Murder', 'Riots', 'Arson', 'Robbery'])
+		else:
+			CrimeBox.configure(values=['Kidnap', 'Murder','Attempt To Murder', 'Riots', 'Arson', 'Robbery', 'Dacoity', 'Preparation & Assembly For Dacoity', 'C H Not Amounting To Murder'])
+
+	def check_crime(*args):
+		StateBox.configure(values=['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu & Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Tamil Nadu', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Chandigarh', 'Dadra & Nagar Haveli', 'Daman & Diu', 'Delhi', 'Lakshadweep', 'Puducherry', 'Andaman & Nicobar Islands','Sikkim'])
+	
+	def check_age(*args):
+		if Age.get().isdigit():
+			temp_age = int(Age.get())
+			if temp_age<1 or temp_age>100:
+				messagebox.showerror("Validation Error","Age has to be between 1-100")
+				Age.set('')
+			del temp_age	
+		elif Age.get()=='':
+			pass
+		else:
+			messagebox.showerror("Validation Error","Age has to be positive number")
+			Age.set('')
+
+	def check_year(*args):
+		if Year.get().isdigit() or Year.get()=='':
+			pass
+		else:
+			messagebox.showerror("Validation Error","Year has to be positive integer")
+			Year.set('')				
+
+	def close():
+		if messagebox.askyesno("Exit","Do you really want to exit ?")==True:
+			dp.plt.close()
+			menu.destroy()
+
+	def back():
+		dp.plt.close()
+		predict_win.destroy()
+		menu.deiconify()
+
+	predict_win = Toplevel()
+	predict_win.geometry("1366x786")
+	predict_win.configure(background="#b3d9ff")
+	predict_win.title("Data Science Project")
+	photo = PhotoImage(file = "Images/icon.png")
+	predict_win.iconphoto(False, photo)
+
+	topFrame = Frame(predict_win,bd=7,relief='raised',bg='#d24dff')
+	intopFrame = Frame(topFrame,bd=5,relief='raised',height=100,bg='#b3d9ff')
+	topFrame.pack(fill = X)
+	intopFrame.pack(fill = X)
+
+	leftFrame = Frame(predict_win,bd=7,relief='raised',bg='#d24dff')
+	upleftFrame = Frame(leftFrame,bd=5,relief='raised',height=310,width=200,bg='#b3d9ff')
+	downleftFrame = Frame(leftFrame,bd=5,relief='sunken',height=500,width=200,bg='#b3d9ff')
+	leftFrame.pack(side=LEFT)
+	upleftFrame.pack(side=TOP)
+	downleftFrame.pack(side=BOTTOM)
+
+	rightFrame = Frame(predict_win,bd=7,relief='raised',bg='#d24dff')
+	inrightFrame = Frame(rightFrame,bd=5,relief='raised',width=1200,bg='#b3d9ff')
+	rightFrame.pack(side=RIGHT,fill = Y)
+	inrightFrame.pack(side=RIGHT,fill = Y)
+
+	photo=1
+	State = StringVar()
+	Crime = StringVar()
+	Year = StringVar()
+	Age = StringVar()
+	Gender = StringVar()
+
+	Gender.trace('w',check_gender)
+	Crime.trace('w',check_crime)
+	Age.trace('w',check_age)
+	Year.trace('w',check_year)
+	
+	Label(intopFrame,text="STATE WISE PREDICTION OF CRIME",bg='#b3d9ff',font=('Times New Roman',25)).place(x=400,y=30)
+
+	Label(upleftFrame,text="LET US PREDICT NUMBER\nOF CRIMES IN FUTURE !!!",bg='#b3d9ff',font=(None,10)).place(x=10,y=10)
+
+	Label(upleftFrame,text="Choose Gender",bg='#b3d9ff').place(x=10,y=50)
+	ttk.Combobox(upleftFrame,values=GenderList,width=21,textvariable=Gender,state='readonly').place(x=3,y=70)
+
+	Label(upleftFrame,text="Choose The Crime",bg='#b3d9ff').place(x=10,y=90)
+	CrimeBox=ttk.Combobox(upleftFrame,values=[],width=21,textvariable=Crime,state='readonly')
+	CrimeBox.place(x=3,y=110)
+
+	Label(upleftFrame,text="Choose The State",bg='#b3d9ff').place(x=10,y=130)
+	StateBox=ttk.Combobox(upleftFrame,values=[],width=21,textvariable=State,state='readonly')
+	StateBox.place(x=3,y=150)
+
+	Label(upleftFrame,text="Enter the age",bg='#b3d9ff').place(x=10,y=170)
+	Entry(upleftFrame,width=22,textvariable=Age).place(x=2,y=190)
+
+
+	Label(upleftFrame,text="Enter A Year in Future",bg='#b3d9ff').place(x=10,y=210)
+	Entry(upleftFrame,width=22,textvariable=Year).place(x=2,y=230)
+
+	submit=PhotoImage(file="Images/success.png")
+	Button(upleftFrame,image=submit,command=plot,relief='flat',bg='#b3d9ff').place(x=140,y=253)
+
+	backbtn = PhotoImage(file='Images/backward.png')
+	Button(intopFrame,image=backbtn,bg='#b3d9ff',relief='flat',command=back).place(x=30,y=10)
+	exitbtn = PhotoImage(file='Images/exit.png')	
+	Button(intopFrame,image=exitbtn,bg='#b3d9ff',relief='flat',command=close).place(x=1180,y=10)
+
+	predict_win.mainloop()
+
+if __name__ == '__main__':
+	StatesList=['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu & Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Tamil Nadu', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Chandigarh', 'Dadra & Nagar Haveli', 'Daman & Diu', 'Delhi', 'Lakshadweep', 'Puducherry', 'Andaman & Nicobar Islands', 'Telangana','Sikkim']
+
+	CrimeList=['Rape', 'Attempt To Murder', 'C H Not Amounting To Murder','Murder', 'Riots', 'Arson', 'Robbery', 'Dacoity', 'Dowry Deaths','Preparation & Assembly For Dacoity', 'Molestation','Sexual Harassment', 'Cruelty By Husband And Relatives',
+	'Importation Of Girls', 'Immoral Traffic (Prevention) Act','Indecent Representation Of Women (Prohibition) Act','Kidnap']
+	GenderList = ['Female','Male']
+
+	main()
